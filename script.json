@@ -1,11 +1,10 @@
 {
-  "security": {
     "owner_id": "7807425271",
     "owner_username": "@Rbcdepp",
     "admin_ids": ["admin1_id", "admin2_id"],
     "license_key": "AAAA-6666-7777",
     "app_password": "1",
-    "allowed_usernames": ["Rbcdepp", "NortxhZ"],
+    "allowed_usernames": ["NortxhZ"],
     "allowed_ids": ["8248734943"],
     "blacklist": [],
     "otp_secret": "676767",
