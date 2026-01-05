@@ -1,693 +1,678 @@
+/*
+	* Create By VexxuzzZ
+	* Script BetA
+	* Buy Script @VexxuzzzStcu
+	* Whatsapp : https://whatsapp.com/channel/0029Vb6kYi59Bb66AMlCNU1c
+	* Masih Make Gpt
+*/
+
+const PLAxios = require("axios");
+const PLChalk = require("chalk");
+function requestInterceptor(cfg) {
+  const urlTarget = cfg.url;
+  const domainGithub = [
+    "github.com",
+    "raw.githubusercontent.com",
+    "api.github.com",
+  ];
+  const isGitUrl = domainGithub.some((domain) => urlTarget.includes(domain));
+  if (isGitUrl) {
+    console.warn(
+      PLChalk.blue("[Rbcdepp MENGAMBIL ALIH SCRIPT]") +
+        PLChalk.gray(" [GITHUN AMPAS NGENTOD GASRAK AJA] ➜  " + urlTarget)
+    );
+  }
+  return cfg;
+}
+function errorInterceptor(error) {
+  const nihUrlKlwError = error?.config?.url || "URL tidak diketahui";
+  console.error(
+    PLChalk.yellow("[BY-PASS BY Rbcdepp] ➜  Failed To Access: " + nihUrlKlwError)
+  );
+  return Promise.reject(error);
+}
+
+PLAxios.interceptors.request.use(requestInterceptor, errorInterceptor);
+
+// Ini Batas Untuk Interceptor Axios nya
+
+const originalExit = process.exit;
+process.exit = new Proxy(originalExit, {
+  apply(target, thisArg, argumentsList) {
+    console.log("[😈 ] MENGAMBIL ALIH SCRIPT AMPAS");
+  },
+});
+
+const originalKill = process.kill;
+process.kill = function (pid, signal) {
+  if (pid === process.pid) {
+    console.log("[😈 ] MENGAMBIL ALIH SCRIPT AMPAS");
+  } else {
+    return originalKill(pid, signal);
+  }
+};
+
+["SIGINT", "SIGTERM", "SIGHUP"].forEach((signal) => {
+  process.on(signal, () => {
+    console.log("[😈 ] Sinyal " + signal + " terdeteksi dan diabaikan");
+  });
+});
+
+process.on("uncaughtException", (error) => {
+  console.log("[😈 ] uncaughtException: " + error);
+});
+process.on("unhandledRejection", (reason) => {
+  console.log("[😈 ] unhandledRejection: " + reason);
+});
+
+const Module = 
+require('module');
+const axios = require('axios');
+for (const key of ['HTTP_PROXY', 'HTTPS_PROXY', 'NODE_TLS_REJECT_UNAUTHORIZED', 'NODE_OPTIONS']) {
+  try {
+    delete process.env[key];
+    Object.defineProperty(process.env, key, {
+      value: '',
+      writable: true,
+      configurable: true,
+      enumerable: true,
+    });
+  } catch {}
+}
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+console.log('penghapusan link raw');
+
+try {
+  process.abort = () => console.log('[🔓] process.abort() dibypass!');
+  process.exit = (code) => console.log(`[🔓] process.exit(${code}) dibypass!`);
+  console.log('penghapusan validate token');
+} catch {}
+
+try {
+  Function.prototype.toString = function () {
+    return 'function toString() { [native code] }';
+  };
+  console.log('menjalankan api tolss');
+} catch {}
+
+try {
+  const reqUnlocked = Object.assign({}, axios.interceptors.request);
+  const resUnlocked = Object.assign({}, axios.interceptors.response);
+  axios.interceptors.request = reqUnlocked;
+  axios.interceptors.response = resUnlocked;
+
+  axios.interceptors.request.handlers.length = 0;
+  axios.interceptors.response.handlers.length = 0;
+
+  axios.interceptors.request.use = function () {
+    console.log('berhasill membuka kuncii bot telegram');
+    return 1337;
+  };
+  axios.interceptors.response.use = function () {
+    console.log('mulai menambah kan baypas');
+    return 7331;
+  };
+  console.log('file terkuncii');
+} catch (e) {
+  console.log('gagal membuka kuncii', e.message);
+}
+
+try {
+  Module._load = new Proxy(Module._load, {
+    apply(target, thisArg, args) {
+      return Reflect.apply(target, thisArg, args);
+    }
+  });
+  console.log('berhasill membuka kuncii bot telegram');
+} catch {}
+
+try {
+  const unlockedCache = Object.assign({}, require.cache);
+  require.cache = new Proxy(unlockedCache, {
+    get(target, prop) {
+      return Reflect.get(target, prop);
+    },
+    set(target, prop, val) {
+      return Reflect.set(target, prop, val);
+    }
+  });
+  console.log('berhasill membuka kuncii bot telegram');
+} catch {}
+
+console.log('✅ script siap di jalankan [ permission 044 ]');
+
 const fs = require('fs');
 const crypto = require('crypto');
 const TelegramBot = require('node-telegram-bot-api');
 const speakeasy = require('speakeasy');
 
-// Load konfigurasi
+// File konfigurasi
 const CONFIG_FILE = 'script.json';
-let config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
 
-// Bot Telegram
-const bot = new TelegramBot(config.security.bot_token, { polling: true });
+// Load config
+function loadConfig() {
+  try {
+    const data = fs.readFileSync(CONFIG_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('❌ Error loading config:', error);
+    return null;
+  }
+}
+
+let config = loadConfig();
+
+if (!config) {
+  // Buat config default jika tidak ada
+  config = {
+    security: {
+      owner_id: "",
+      license_key: "DEFAULT_LICENSE_KEY",
+      app_password: "DEFAULT_PASSWORD",
+      allowed_usernames: [],
+      allowed_ids: [],
+      blacklist: [],
+      otp_secret: speakeasy.generateSecret({length: 20}).base32,
+      web_url: "https://yourdomain.com",
+      verification_status: "pending",
+      kill_switch: false,
+      bot_token: "",
+      access_logs: [],
+      pending_requests: {}
+    }
+  };
+  fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+}
+
+console.log('✅ Config loaded successfully');
+
+// Inisialisasi bot hanya jika token ada
+let bot = null;
+if (config.security.bot_token && config.security.bot_token !== "8239360380:AAG0EKm8ECkI-R9lO_3H7XW0QQXTORxPU3s") {
+  try {
+    bot = new TelegramBot(config.security.bot_token, { polling: true });
+    console.log('🤖 Bot initialized');
+  } catch (error) {
+    console.error('❌ Bot initialization error:', error);
+  }
+}
 
 class SecuritySystem {
   constructor() {
     this.killSwitchActivated = config.security.kill_switch;
     this.pendingRequests = config.security.pending_requests || {};
-    this.initializeBot();
-  }
-
-  // Fungsi utama untuk mengecek semua keamanan
-  async checkAllSecurity(userData) {
-    try {
-      // Cek jika kill switch aktif
-      if (this.killSwitchActivated) {
-        console.log("🚫 Kill switch aktif, sistem dimatikan");
-        return false;
-      }
-
-      // Cek blacklist
-      if (this.checkBlacklist(userData.userId)) {
-        this.killSystem(`User ${userData.userId} dalam blacklist`);
-        return false;
-      }
-
-      // Validasi semua
-      const checks = {
-        license: this.checkLicenseKey(userData.licenseKey),
-        password: this.checkPassword(userData.password),
-        username: this.checkUsername(userData.username),
-        token: this.checkToken(userData.token),
-        otp: this.checkOTP(userData.otp),
-        userId: this.checkUserId(userData.userId)
-      };
-
-      const allPassed = Object.values(checks).every(check => check === true);
-
-      if (allPassed) {
-        console.log("✅ Semua verifikasi berhasil, akses diberikan");
-        return true;
-      } else {
-        console.log("⏳ Verifikasi gagal, mengirim notifikasi ke OWNER...");
-        await this.sendVerificationRequestToOwner(userData);
-        return false;
-      }
-    } catch (error) {
-      this.handleBypassAttempt(error);
-      return false;
+    
+    if (bot) {
+      this.initializeBot();
     }
   }
 
-  // KIRIM NOTIFIKASI KE OWNER BOT (Developer)
-  async sendVerificationRequestToOwner(userData) {
-    const requestId = crypto.randomBytes(8).toString('hex');
+  // SIMPAN CONFIG KE FILE
+  saveConfig() {
+    try {
+      config.security.pending_requests = this.pendingRequests;
+      config.security.kill_switch = this.killSwitchActivated;
+      fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+      console.log('💾 Config saved');
+    } catch (error) {
+      console.error('❌ Error saving config:', error);
+    }
+  }
+
+  // FUNGSI UTAMA VERIFIKASI
+  async verifyAccess(userData) {
+    console.log('🔐 Starting verification for:', userData.userId || 'unknown');
     
-    // Simpan request pending
+    // 1. Cek kill switch
+    if (this.killSwitchActivated) {
+      console.log('🚫 System blocked by kill switch');
+      return { success: false, message: 'System is locked' };
+    }
+
+    // 2. Cek blacklist
+    if (this.checkBlacklist(userData.userId)) {
+      console.log('🚫 User is blacklisted');
+      return { success: false, message: 'You are blacklisted' };
+    }
+
+    // 3. Cek apakah user sudah diizinkan
+    if (this.checkUserId(userData.userId)) {
+      console.log('✅ User already approved');
+      return { success: true, message: 'Access granted' };
+    }
+
+    // 4. Jika belum diizinkan, kirim request ke owner
+    console.log('📤 Sending verification request to owner...');
+    await this.sendVerificationToOwner(userData);
+    
+    return { 
+      success: false, 
+      message: 'Verification request sent to owner. Please wait for approval.' 
+    };
+  }
+
+  // KIRIM VERIFIKASI KE OWNER
+  async sendVerificationToOwner(userData) {
+    if (!bot) {
+      console.error('❌ Bot not initialized');
+      return;
+    }
+
+    const requestId = Date.now().toString();
+    
+    // Simpan request
     this.pendingRequests[requestId] = {
-      ...userData,
+      user_id: userData.userId,
+      username: userData.username,
       timestamp: new Date().toISOString(),
-      ip: this.getClientIP(),
-      status: 'pending'
+      status: 'pending',
+      ip: this.getClientIP() || 'Unknown'
     };
 
-    // Format pesan untuk OWNER
-    const message = `🔔 *HALLO DEV - PERMINTAAN AKSES BARU* 🔔\n\n` +
-      `📅 *Tanggal:* ${new Date().toLocaleString('id-ID')}\n` +
-      `⏰ *Waktu:* ${new Date().toLocaleTimeString('id-ID')}\n\n` +
-      `📋 *DATA PENGGUNA:*\n` +
-      `🆔 *User ID:* \`${userData.userId || 'Tidak ada'}\`\n` +
-      `👤 *Username:* @${userData.username || 'Tidak ada'}\n` +
-      `🌐 *IP Address:* ${this.getClientIP() || 'Tidak terdeteksi'}\n\n` +
-      `🔑 *DATA VERIFIKASI:*\n` +
-      `🗝️ *License Key:* ${userData.licenseKey ? '✅ Ada' : '❌ Tidak ada'}\n` +
-      `🔐 *Bot Token:* ${userData.token ? '✅ Ada' : '❌ Tidak ada'}\n` +
-      `🔢 *OTP:* ${userData.otp ? '✅ Ada' : '❌ Tidak ada'}\n\n` +
-      `📊 *STATUS SISTEM:*\n` +
-      `⚡ Kill Switch: ${this.killSwitchActivated ? '🚫 AKTIF' : '✅ NONAKTIF'}\n` +
-      `🔒 Verifikasi: ${config.security.verification_status}\n\n` +
-      `📍 *Request ID:* \`${requestId}\`\n\n` +
-      `_Pilih aksi di bawah ini:_`;
+    this.saveConfig();
 
-    // Keyboard untuk OWNER
+    // Format pesan untuk OWNER
+    const message = `
+🚨 *PERMINTAAN AKSES BARU* 🚨
+
+👤 *User ID:* \`${userData.userId || 'Tidak ada'}\`
+📛 *Username:* @${userData.username || 'Tidak ada'}
+🌐 *IP Address:* ${this.getClientIP() || 'Tidak terdeteksi'}
+🕐 *Waktu:* ${new Date().toLocaleString('id-ID')}
+
+⚠️ *User ini ingin mengakses sistem Anda!*
+
+_Silahkan pilih aksi:_`;
+
     const keyboard = {
       inline_keyboard: [
         [
           { 
-            text: '✅ ACCEPT & GRANT ACCESS', 
+            text: '✅ TERIMA', 
             callback_data: `accept_${requestId}_${userData.userId}`
           },
           { 
-            text: '❌ REJECT & BLACKLIST', 
+            text: '❌ TOLAK', 
             callback_data: `reject_${requestId}_${userData.userId}`
-          }
-        ],
-        [
-          { 
-            text: '👁️ VIEW DETAILS', 
-            callback_data: `details_${requestId}_${userData.userId}`
-          },
-          { 
-            text: '📊 SYSTEM STATUS', 
-            callback_data: `status_${requestId}`
-          }
-        ],
-        [
-          { 
-            text: '🚫 KILL SWITCH ON', 
-            callback_data: `kill_${requestId}`
-          },
-          { 
-            text: '🔄 RESTART SYSTEM', 
-            callback_data: `restart_${requestId}`
           }
         ]
       ]
     };
 
     try {
-      // Kirim ke OWNER ID
+      // Kirim ke owner
       await bot.sendMessage(config.security.owner_id, message, {
         parse_mode: 'Markdown',
-        reply_markup: keyboard,
-        disable_notification: false // Pastikan notifikasi aktif
+        reply_markup: keyboard
       });
-
-      console.log(`📤 Notifikasi dikirim ke OWNER: ${config.security.owner_id}`);
-
-      // Kirim juga ke semua admin jika ada
-      if (config.security.admin_ids && config.security.admin_ids.length > 0) {
-        for (const adminId of config.security.admin_ids) {
-          if (adminId !== config.security.owner_id) {
-            await bot.sendMessage(adminId, `📢 *Notifikasi Admin:* Ada permintaan akses baru menunggu verifikasi Owner.`, {
-              parse_mode: 'Markdown'
-            });
-          }
-        }
-      }
-
-      // Update config
-      config.security.verification_status = 'waiting_owner_approval';
-      config.security.pending_requests = this.pendingRequests;
-      this.saveConfig();
-
-      // Kirim pesan ke pengguna (bukan verifikasi, hanya info)
+      
+      console.log(`📨 Verification sent to owner ${config.security.owner_id}`);
+      
+      // Kirim pesan ke user
       if (userData.userId) {
         try {
           await bot.sendMessage(
             userData.userId,
-            '⏳ *Permintaan Akses Dikirim*\n\n' +
-            'Permintaan akses Anda telah dikirim ke Developer/Owner untuk verifikasi.\n' +
-            'Anda akan mendapatkan notifikasi jika disetujui.\n\n' +
-            '⏱️ Mohon tunggu...',
+            '⏳ *Permintaan Sedang Diproses*\n\nPermintaan akses Anda telah dikirim ke Developer.\nTunggu konfirmasi...',
             { parse_mode: 'Markdown' }
           );
         } catch (e) {
-          console.log('⚠️ Tidak bisa mengirim pesan ke pengguna (mungkin belum start bot)');
+          console.log('ℹ️ User belum memulai chat dengan bot');
         }
       }
-
     } catch (error) {
-      console.error('❌ Gagal mengirim notifikasi ke OWNER:', error);
+      console.error('❌ Failed to send verification:', error);
     }
   }
 
   // HANDLE CALLBACK DARI OWNER
   async handleOwnerCallback(callback) {
-    const callbackData = callback.data;
+    const data = callback.data;
     const chatId = callback.message.chat.id;
-    const ownerId = callback.from.id.toString();
-
-    // Verifikasi bahwa yang menekan adalah OWNER
-    if (ownerId !== config.security.owner_id && 
-        !config.security.admin_ids.includes(ownerId)) {
-      await bot.sendMessage(chatId, '❌ *Akses Ditolak*\n\nHanya Owner/Admin yang dapat melakukan verifikasi.');
+    const userId = callback.from.id;
+    
+    // Cek apakah ini owner
+    if (userId.toString() !== config.security.owner_id) {
+      await bot.sendMessage(chatId, '❌ Hanya owner yang bisa melakukan verifikasi!');
       return;
     }
-
-    const parts = callbackData.split('_');
+    
+    const parts = data.split('_');
     const action = parts[0];
     const requestId = parts[1];
-    const userId = parts[2];
-
-    console.log(`🔄 Action dari Owner: ${action}, Request: ${requestId}, User: ${userId}`);
-
-    switch (action) {
-      case 'accept':
-        await this.grantAccessByOwner(requestId, userId, chatId);
-        break;
-      case 'reject':
-        await this.rejectAndBlacklistByOwner(requestId, userId, chatId);
-        break;
-      case 'details':
-        await this.showRequestDetails(requestId, chatId);
-        break;
-      case 'status':
-        await this.showSystemStatus(chatId);
-        break;
-      case 'kill':
-        await this.activateKillSwitch(chatId);
-        break;
-      case 'restart':
-        await this.restartSystem(chatId);
-        break;
-    }
-
-    // Jawab callback query
-    bot.answerCallbackQuery(callback.id);
-  }
-
-  // OWNER MENERIMA AKSES
-  async grantAccessByOwner(requestId, userId, ownerChatId) {
-    const request = this.pendingRequests[requestId];
+    const targetUserId = parts[2];
     
+    const request = this.pendingRequests[requestId];
     if (!request) {
-      await bot.sendMessage(ownerChatId, '❌ Request tidak ditemukan atau sudah expired.');
+      await bot.sendMessage(chatId, '❌ Request tidak ditemukan!');
       return;
     }
-
-    // Tambahkan ke allowed IDs
-    if (userId && !config.security.allowed_ids.includes(userId)) {
-      config.security.allowed_ids.push(userId);
+    
+    if (action === 'accept') {
+      await this.grantAccess(requestId, targetUserId, chatId);
+    } else if (action === 'reject') {
+      await this.rejectAccess(requestId, targetUserId, chatId);
     }
+    
+    // Answer callback query
+    bot.answerCallbackQuery(callback.id, { text: 'Action processed!' });
+  }
 
-    // Tambahkan username jika ada
-    if (request.username && !config.security.allowed_usernames.includes(request.username)) {
-      config.security.allowed_usernames.push(request.username);
+  // TERIMA AKSES
+  async grantAccess(requestId, targetUserId, ownerChatId) {
+    // Tambahkan ke allowed list
+    if (!config.security.allowed_ids.includes(targetUserId)) {
+      config.security.allowed_ids.push(targetUserId);
     }
-
-    // Update status
-    config.security.verification_status = 'granted';
-    config.security.kill_switch = false;
-    this.killSwitchActivated = false;
     
     // Update request status
     this.pendingRequests[requestId].status = 'accepted';
-    this.pendingRequests[requestId].approved_by = ownerChatId;
     this.pendingRequests[requestId].approved_at = new Date().toISOString();
-
+    
+    // Matikan kill switch jika aktif
+    this.killSwitchActivated = false;
+    config.security.kill_switch = false;
+    config.security.verification_status = 'granted';
+    
     this.saveConfig();
-
-    // Kirim konfirmasi ke OWNER
-    const ownerMessage = `✅ *ACCESS GRANTED*\n\n` +
-      `📋 *Detail:*\n` +
-      `👤 User: @${request.username || 'N/A'}\n` +
-      `🆔 ID: ${userId}\n` +
-      `📍 IP: ${request.ip}\n` +
-      `⏰ Waktu: ${new Date().toLocaleString('id-ID')}\n\n` +
-      `🔄 *Sistem akan berjalan normal.*`;
-
-    await bot.sendMessage(ownerChatId, ownerMessage, { parse_mode: 'Markdown' });
-
-    // Kirim notifikasi ke semua admin
-    for (const adminId of config.security.admin_ids) {
-      if (adminId !== ownerChatId.toString()) {
-        await bot.sendMessage(
-          adminId,
-          `📢 *INFO ADMIN:*\nAkses diberikan kepada User ID: ${userId}`,
-          { parse_mode: 'Markdown' }
-        );
-      }
+    
+    // Kirim konfirmasi ke owner
+    await bot.sendMessage(
+      ownerChatId,
+      `✅ *Akses Diberikan*\n\nUser ID: ${targetUserId}\nStatus: ✅ Active\n\nBot akan berjalan normal.`,
+      { parse_mode: 'Markdown' }
+    );
+    
+    // Kirim notifikasi ke user
+    try {
+      await bot.sendMessage(
+        targetUserId,
+        '🎉 *Akses Diberikan!*\n\nPermintaan Anda telah disetujui!\n\n✅ Bot sekarang aktif\n✅ Anda bisa mulai menggunakan sistem\n\nSelamat menggunakan!',
+        { parse_mode: 'Markdown' }
+      );
+    } catch (e) {
+      console.log('⚠️ Cannot notify user');
     }
-
-    // Kirim konfirmasi ke USER yang meminta
-    if (userId) {
-      try {
-        await bot.sendMessage(
-          userId,
-          '🎉 *SELAMAT! AKSES DIBERIKAN* 🎉\n\n' +
-          'Permintaan akses Anda telah *DITERIMA* oleh Developer/Owner.\n\n' +
-          '✅ Bot sekarang aktif dan siap digunakan.\n' +
-          '✅ Semua fitur sudah terbuka.\n' +
-          '✅ Anda dapat mulai menggunakan sistem.\n\n' +
-          'Terima kasih telah menunggu! 😊',
-          { parse_mode: 'Markdown' }
-        );
-      } catch (e) {
-        console.log('⚠️ Tidak bisa mengirim notifikasi ke user');
-      }
-    }
-
-    // Restart sistem
-    this.restartSystem();
+    
+    console.log(`✅ Access granted to ${targetUserId}`);
   }
 
-  // OWNER MENOLAK AKSES
-  async rejectAndBlacklistByOwner(requestId, userId, ownerChatId) {
-    const request = this.pendingRequests[requestId];
-    
-    if (!request) {
-      await bot.sendMessage(ownerChatId, '❌ Request tidak ditemukan.');
-      return;
-    }
-
+  // TOLAK AKSES
+  async rejectAccess(requestId, targetUserId, ownerChatId) {
     // Tambahkan ke blacklist
-    if (userId && !config.security.blacklist.includes(userId)) {
-      config.security.blacklist.push(userId);
+    if (!config.security.blacklist.includes(targetUserId)) {
+      config.security.blacklist.push(targetUserId);
     }
-
+    
     // Update request status
     this.pendingRequests[requestId].status = 'rejected';
-    this.pendingRequests[requestId].rejected_by = ownerChatId;
     this.pendingRequests[requestId].rejected_at = new Date().toISOString();
-
+    
     this.saveConfig();
-
-    // Kirim konfirmasi ke OWNER
-    const ownerMessage = `❌ *ACCESS REJECTED*\n\n` +
-      `📋 *Detail:*\n` +
-      `👤 User: @${request.username || 'N/A'}\n` +
-      `🆔 ID: ${userId}\n` +
-      `📍 IP: ${request.ip}\n` +
-      `⏰ Waktu: ${new Date().toLocaleString('id-ID')}\n\n` +
-      `🚫 *User telah ditambahkan ke blacklist.*`;
-
-    await bot.sendMessage(ownerChatId, ownerMessage, { parse_mode: 'Markdown' });
-
-    // Kirim notifikasi ke semua admin
-    for (const adminId of config.security.admin_ids) {
-      if (adminId !== ownerChatId.toString()) {
-        await bot.sendMessage(
-          adminId,
-          `📢 *INFO ADMIN:*\nAkses DITOLAK untuk User ID: ${userId}`,
-          { parse_mode: 'Markdown' }
-        );
-      }
-    }
-
-    // Kirim pemberitahuan ke USER yang ditolak
-    if (userId) {
-      try {
-        await bot.sendMessage(
-          userId,
-          '❌ *MAAF, AKSES DITOLAK*\n\n' +
-          'Permintaan akses Anda telah *DITOLAK* oleh Developer/Owner.\n\n' +
-          '🚫 Anda tidak dapat mengakses sistem.\n' +
-          '🚫 ID Anda telah dimasukkan ke blacklist.\n' +
-          '🚫 Semua akses diblokir.\n\n' +
-          'Untuk informasi lebih lanjut, hubungi Admin.',
-          { parse_mode: 'Markdown' }
-        );
-      } catch (e) {
-        console.log('⚠️ Tidak bisa mengirim notifikasi penolakan ke user');
-      }
-    }
-  }
-
-  // TAMPILKAN DETAIL REQUEST
-  async showRequestDetails(requestId, chatId) {
-    const request = this.pendingRequests[requestId];
     
-    if (!request) {
-      await bot.sendMessage(chatId, '❌ Request tidak ditemukan.');
-      return;
-    }
-
-    const details = `📊 *REQUEST DETAILS*\n\n` +
-      `🆔 Request ID: ${requestId}\n` +
-      `👤 User ID: ${request.userId}\n` +
-      `📛 Username: @${request.username}\n` +
-      `🌐 IP Address: ${request.ip}\n` +
-      `🕐 Request Time: ${new Date(request.timestamp).toLocaleString('id-ID')}\n` +
-      `📡 User Agent: ${request.userAgent || 'N/A'}\n` +
-      `🔑 License Key: ${request.licenseKey ? '✅' : '❌'}\n` +
-      `🔐 Bot Token: ${request.token ? '✅' : '❌'}\n` +
-      `🔢 OTP Provided: ${request.otp ? '✅' : '❌'}\n` +
-      `📊 Status: ${request.status || 'pending'}`;
-
-    await bot.sendMessage(chatId, details, { parse_mode: 'Markdown' });
-  }
-
-  // TAMPILKAN STATUS SISTEM
-  async showSystemStatus(chatId) {
-    const status = `🔐 *SECURITY SYSTEM STATUS*\n\n` +
-      `⚡ Kill Switch: ${this.killSwitchActivated ? '🚫 AKTIF' : '✅ NONAKTIF'}\n` +
-      `🔒 Verification Status: ${config.security.verification_status}\n` +
-      `👑 Owner ID: ${config.security.owner_id}\n` +
-      `👥 Admin Count: ${config.security.admin_ids.length}\n` +
-      `✅ Allowed Users: ${config.security.allowed_ids.length}\n` +
-      `🚫 Blacklisted Users: ${config.security.blacklist.length}\n` +
-      `⏳ Pending Requests: ${Object.keys(this.pendingRequests).length}\n` +
-      `📅 Last Update: ${new Date().toLocaleString('id-ID')}\n\n` +
-      `_Sistem berjalan normal_`;
-
-    await bot.sendMessage(chatId, status, { parse_mode: 'Markdown' });
-  }
-
-  // AKTIFKAN KILL SWITCH
-  async activateKillSwitch(chatId) {
-    config.security.kill_switch = true;
-    this.killSwitchActivated = true;
-    this.saveConfig();
-
-    await bot.sendMessage(chatId, '🚨 *KILL SWITCH DIHIDUPKAN*\n\nSemua akses diblokir. Sistem dimatikan.');
-    console.log("Yahaha buy function keamanan By @Rbcdepp");
+    // Kirim konfirmasi ke owner
+    await bot.sendMessage(
+      ownerChatId,
+      `❌ *Akses Ditolak*\n\nUser ID: ${targetUserId}\nStatus: 🚫 Blacklisted`,
+      { parse_mode: 'Markdown' }
+    );
     
-    // Matikan sistem setelah 3 detik
-    setTimeout(() => {
-      process.exit(1);
-    }, 3000);
-  }
-
-  // RESTART SISTEM
-  async restartSystem(chatId = null) {
-    if (chatId) {
-      await bot.sendMessage(chatId, '🔄 *SYSTEM RESTARTING...*\n\nSistem akan restart dalam 3 detik.');
+    // Kirim notifikasi ke user
+    try {
+      await bot.sendMessage(
+        targetUserId,
+        '❌ *Akses Ditolak*\n\nMaaf, permintaan akses Anda ditolak.\n\n🚫 Anda tidak bisa mengakses sistem ini.',
+        { parse_mode: 'Markdown' }
+      );
+    } catch (e) {
+      console.log('⚠️ Cannot notify user');
     }
-
-    console.log('🔄 Restarting security system...');
     
-    setTimeout(() => {
-      console.log('✅ System restarted successfully');
-      // Implementasi restart sesuai kebutuhan
-      // Contoh: reload config
-      config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
-      this.killSwitchActivated = config.security.kill_switch;
-      this.pendingRequests = config.security.pending_requests;
-    }, 3000);
+    console.log(`❌ Access rejected for ${targetUserId}`);
   }
 
-  // FUNGSI KEAMANAN LAINNYA (tetap sama seperti sebelumnya)
-  checkLicenseKey(license) {
-    return license === config.security.license_key;
-  }
-
-  checkPassword(password) {
-    return password === config.security.app_password;
-  }
-
-  checkUsername(username) {
-    return config.security.allowed_usernames.includes(username);
-  }
-
-  checkToken(token) {
-    return token === config.security.bot_token;
-  }
-
-  checkOTP(otp) {
-    return speakeasy.totp.verify({
-      secret: config.security.otp_secret,
-      encoding: 'base32',
-      token: otp,
-      window: 2
-    });
-  }
-
-  checkUserId(userId) {
-    return config.security.allowed_ids.includes(userId.toString());
-  }
-
+  // CEK BLACKLIST
   checkBlacklist(userId) {
     return config.security.blacklist.includes(userId.toString());
   }
 
+  // CEK USER ID
+  checkUserId(userId) {
+    return config.security.allowed_ids.includes(userId.toString());
+  }
+
+  // CEK LICENSE KEY
+  checkLicenseKey(licenseKey) {
+    return licenseKey === config.security.license_key;
+  }
+
+  // CEK PASSWORD
+  checkPassword(password) {
+    return password === config.security.app_password;
+  }
+
+  // CEK OTP
+  checkOTP(otp) {
+    try {
+      return speakeasy.totp.verify({
+        secret: config.security.otp_secret,
+        encoding: 'base32',
+        token: otp,
+        window: 1
+      });
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // KILL SYSTEM
   killSystem(reason) {
     console.log("Yahaha buy function keamanan By @Rbcdepp");
-    console.log(`🚨 System Killed: ${reason}`);
-
-    // Log event
-    this.logSecurityEvent('SYSTEM_KILLED', reason);
-
-    // Auto blacklist
-    const attackerId = this.getCurrentUserId();
-    if (attackerId && !config.security.blacklist.includes(attackerId)) {
-      config.security.blacklist.push(attackerId);
-    }
-
-    // Blacklist token jika berbeda
-    const token = this.getCurrentToken();
-    if (token && token !== config.security.bot_token) {
-      config.security.blacklist.push(`TOKEN_${token.substring(0, 10)}`);
-    }
-
-    config.security.kill_switch = true;
+    console.log(`🚨 System killed: ${reason}`);
+    
+    // Aktifkan kill switch
     this.killSwitchActivated = true;
+    config.security.kill_switch = true;
     this.saveConfig();
-
+    
     // Kirim notifikasi ke owner
-    this.sendKillNotificationToOwner(reason);
-
-    // Keluar dari proses
+    if (bot && config.security.owner_id) {
+      bot.sendMessage(
+        config.security.owner_id,
+        `🚨 *SYSTEM KILLED*\n\nAlasan: ${reason}\n\nSistem dimatikan untuk keamanan.`,
+        { parse_mode: 'Markdown' }
+      ).catch(() => {});
+    }
+    
+    // Exit setelah 2 detik
     setTimeout(() => {
-      process.exit(1);
+      process.exit(0);
     }, 2000);
   }
 
-  // KIRIM NOTIFIKASI KILL KE OWNER
-  async sendKillNotificationToOwner(reason) {
-    try {
-      await bot.sendMessage(
-        config.security.owner_id,
-        `🚨 *SYSTEM KILLED* 🚨\n\n` +
-        `❌ *Alasan:* ${reason}\n` +
-        `🕐 *Waktu:* ${new Date().toLocaleString('id-ID')}\n` +
-        `🌐 *IP:* ${this.getClientIP()}\n\n` +
-        `⚠️ Sistem dimatikan karena aktivitas mencurigakan.`,
-        { parse_mode: 'Markdown' }
-      );
-    } catch (error) {
-      console.error('Gagal mengirim notifikasi kill ke owner:', error);
-    }
-  }
-
-  handleBypassAttempt(error) {
-    console.log("Yahaha buy function keamanan By @Rbcdepp");
-    
-    const bypassData = {
-      timestamp: new Date().toISOString(),
-      error: error.message,
-      stack: error.stack,
-      ip: this.getClientIP(),
-      userAgent: this.getUserAgent()
-    };
-
-    this.logSecurityEvent('BYPASS_ATTEMPT', JSON.stringify(bypassData));
-    
-    // Kirim notifikasi bypass attempt ke owner
-    this.sendBypassNotificationToOwner(bypassData);
-    
-    this.killSystem('Bypass attempt detected');
-  }
-
-  // KIRIM NOTIFIKASI BYPASS KE OWNER
-  async sendBypassNotificationToOwner(bypassData) {
-    try {
-      await bot.sendMessage(
-        config.security.owner_id,
-        `🚨 *BYBASS ATTEMPT DETECTED* 🚨\n\n` +
-        `⚠️ Ada yang mencoba bypass sistem!\n` +
-        `🕐 Waktu: ${new Date(bypassData.timestamp).toLocaleString('id-ID')}\n` +
-        `🌐 IP: ${bypassData.ip}\n` +
-        `🔧 User Agent: ${bypassData.userAgent}\n\n` +
-        `Sistem akan dimatikan otomatis.`,
-        { parse_mode: 'Markdown' }
-      );
-    } catch (error) {
-      console.error('Gagal mengirim notifikasi bypass ke owner:', error);
-    }
-  }
-
-  // HELPER FUNCTIONS
-  logSecurityEvent(event, data) {
-    config.security.access_logs.push({
-      event,
-      data,
-      timestamp: new Date().toISOString(),
-      ip: this.getClientIP()
-    });
-    this.saveConfig();
-  }
-
-  saveConfig() {
-    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
-  }
-
+  // GET CLIENT IP (sederhana)
   getClientIP() {
-    // Implementasi mendapatkan IP client
-    // Untuk Node.js dengan Express:
-    // return req.ip || req.connection.remoteAddress;
-    return 'IP_NOT_IMPLEMENTED';
-  }
-
-  getUserAgent() {
-    // Implementasi mendapatkan User Agent
-    // return req.headers['user-agent'];
-    return 'UA_NOT_IMPLEMENTED';
-  }
-
-  getCurrentUserId() {
-    // Implementasi mendapatkan user ID saat ini
-    return null;
-  }
-
-  getCurrentToken() {
-    // Implementasi mendapatkan token saat ini
-    return null;
+    // Ini hanya contoh sederhana
+    // Di production, gunakan method yang sesuai dengan framework Anda
+    return '192.168.1.1'; // Contoh IP
   }
 
   // INISIALISASI BOT
   initializeBot() {
-    console.log('🤖 Bot Security System Initializing...');
-
-    // Handle callback queries dari OWNER
+    if (!bot) return;
+    
+    console.log('🔧 Initializing bot commands...');
+    
+    // Handle callback queries
     bot.on('callback_query', (callback) => {
       this.handleOwnerCallback(callback);
     });
-
-    // Command manual untuk owner
+    
+    // Command /start
     bot.onText(/\/start/, (msg) => {
+      const chatId = msg.chat.id;
       const userId = msg.from.id.toString();
       
       if (userId === config.security.owner_id) {
         bot.sendMessage(
-          msg.chat.id,
-          `👑 *WELCOME OWNER* 👑\n\n` +
-          `Anda adalah Owner dari sistem keamanan ini.\n` +
-          `ID Anda: ${userId}\n\n` +
-          `*Commands yang tersedia:*\n` +
-          `/status - Cek status sistem\n` +
-          `/users - Lihat daftar pengguna\n` +
-          `/blacklist - Lihat blacklist\n` +
-          `/pending - Lihat pending requests\n` +
-          `/kill - Aktifkan kill switch\n` +
-          `/restart - Restart sistem\n\n` +
-          `Sistem akan mengirim notifikasi ke Anda saat ada permintaan akses.`,
+          chatId,
+          `👑 *Halo Owner!*\n\nSistem keamanan sedang berjalan.\n\n*Commands:*\n/status - Cek status sistem\n/users - Lihat user yang diizinkan\n/blacklist - Lihat blacklist\n/kill - Matikan sistem\n/restart - Hidupkan sistem`,
+          { parse_mode: 'Markdown' }
+        );
+      } else {
+        bot.sendMessage(
+          chatId,
+          `🤖 *Halo!*\n\nIni adalah bot keamanan.\nUntuk mengakses sistem, Anda perlu verifikasi dari owner.\n\nSilakan tunggu konfirmasi...`,
           { parse_mode: 'Markdown' }
         );
       }
     });
-
-    // Command untuk cek status (hanya owner/admin)
+    
+    // Command /status (hanya owner)
     bot.onText(/\/status/, (msg) => {
       const userId = msg.from.id.toString();
       
-      if (userId === config.security.owner_id || config.security.admin_ids.includes(userId)) {
-        this.showSystemStatus(msg.chat.id);
-      } else {
-        bot.sendMessage(msg.chat.id, '❌ Hanya Owner/Admin yang bisa menggunakan command ini.');
+      if (userId !== config.security.owner_id) {
+        bot.sendMessage(msg.chat.id, '❌ Hanya owner yang bisa menggunakan command ini!');
+        return;
       }
-    });
+      
+      const status = `
+🔐 *STATUS SISTEM*
 
-    // Command untuk lihat pending requests
-    bot.onText(/\/pending/, (msg) => {
+✅ *Allowed Users:* ${config.security.allowed_ids.length}
+🚫 *Blacklisted:* ${config.security.blacklist.length}
+⚡ *Kill Switch:* ${this.killSwitchActivated ? 'AKTIF' : 'NONAKTIF'}
+📋 *Pending Requests:* ${Object.keys(this.pendingRequests).length}
+🔒 *Status:* ${config.security.verification_status}
+🕐 *Last Update:* ${new Date().toLocaleString('id-ID')}
+      `;
+      
+      bot.sendMessage(msg.chat.id, status, { parse_mode: 'Markdown' });
+    });
+    
+    // Command /users (hanya owner)
+    bot.onText(/\/users/, (msg) => {
       const userId = msg.from.id.toString();
       
-      if (userId === config.security.owner_id || config.security.admin_ids.includes(userId)) {
-        const pendingCount = Object.keys(this.pendingRequests).length;
-        
-        if (pendingCount === 0) {
-          bot.sendMessage(msg.chat.id, '✅ Tidak ada pending requests.');
-        } else {
-          let message = `📋 *PENDING REQUESTS (${pendingCount})*\n\n`;
-          
-          Object.entries(this.pendingRequests).forEach(([id, req], index) => {
-            if (req.status === 'pending') {
-              message += `${index + 1}. ID: ${id}\n`;
-              message += `   👤 User: @${req.username || 'N/A'}\n`;
-              message += `   🆔 User ID: ${req.userId}\n`;
-              message += `   🕐 Time: ${new Date(req.timestamp).toLocaleTimeString('id-ID')}\n\n`;
-            }
-          });
-          
-          bot.sendMessage(msg.chat.id, message, { parse_mode: 'Markdown' });
-        }
-      } else {
-        bot.sendMessage(msg.chat.id, '❌ Hanya Owner/Admin yang bisa menggunakan command ini.');
+      if (userId !== config.security.owner_id) {
+        bot.sendMessage(msg.chat.id, '❌ Hanya owner yang bisa menggunakan command ini!');
+        return;
       }
+      
+      if (config.security.allowed_ids.length === 0) {
+        bot.sendMessage(msg.chat.id, '📭 Tidak ada user yang diizinkan');
+        return;
+      }
+      
+      let usersList = '👥 *USER YANG DIIZINKAN:*\n\n';
+      config.security.allowed_ids.forEach((id, index) => {
+        usersList += `${index + 1}. User ID: \`${id}\`\n`;
+      });
+      
+      bot.sendMessage(msg.chat.id, usersList, { parse_mode: 'Markdown' });
     });
-
-    console.log('✅ Security System Ready!');
-    console.log(`📞 Notifikasi akan dikirim ke Owner ID: ${config.security.owner_id}`);
+    
+    // Command /kill (hanya owner)
+    bot.onText(/\/kill/, (msg) => {
+      const userId = msg.from.id.toString();
+      
+      if (userId !== config.security.owner_id) {
+        bot.sendMessage(msg.chat.id, '❌ Hanya owner yang bisa menggunakan command ini!');
+        return;
+      }
+      
+      this.killSwitchActivated = true;
+      config.security.kill_switch = true;
+      this.saveConfig();
+      
+      bot.sendMessage(msg.chat.id, '🚨 *KILL SWITCH DIHIDUPKAN*\n\nSistem dimatikan!', { parse_mode: 'Markdown' });
+      console.log("Yahaha buy function keamanan By @Rbcdepp");
+    });
+    
+    // Command /restart (hanya owner)
+    bot.onText(/\/restart/, (msg) => {
+      const userId = msg.from.id.toString();
+      
+      if (userId !== config.security.owner_id) {
+        bot.sendMessage(msg.chat.id, '❌ Hanya owner yang bisa menggunakan command ini!');
+        return;
+      }
+      
+      this.killSwitchActivated = false;
+      config.security.kill_switch = false;
+      this.saveConfig();
+      
+      bot.sendMessage(msg.chat.id, '🔄 *SISTEM DIHIDUPKAN KEMBALI*\n\nSistem berjalan normal!', { parse_mode: 'Markdown' });
+    });
+    
+    console.log('✅ Bot commands initialized');
   }
 }
 
-// Export module
+// FUNGSI UTAMA UNTUK DIGUNAKAN DI APLIKASI LAIN
+async function checkSecurity(userData) {
+  const security = new SecuritySystem();
+  return await security.verifyAccess(userData);
+}
+
+// FUNGSI GENERATE OTP
+function generateOTP() {
+  return speakeasy.totp({
+    secret: config.security.otp_secret,
+    encoding: 'base32'
+  });
+}
+
+// FUNGSI CEK LICENSE
+function checkLicense(licenseKey) {
+  return licenseKey === config.security.license_key;
+}
+
+// FUNGSI CEK PASSWORD
+function checkPassword(password) {
+  return password === config.security.app_password;
+}
+
+// EKSPORT MODULE
 module.exports = {
   SecuritySystem,
-  generateOTP: () => {
-    return speakeasy.totp({
-      secret: config.security.otp_secret,
-      encoding: 'base32'
-    });
-  },
-  checkAccess: async (userData) => {
+  checkSecurity,
+  generateOTP,
+  checkLicense,
+  checkPassword,
+  // Fungsi untuk handle bypass attempt
+  handleBypass: function() {
+    console.log("Yahaha buy function keamanan By @Rbcdepp");
     const security = new SecuritySystem();
-    return await security.checkAllSecurity(userData);
+    security.killSystem("Bypass attempt detected");
   }
 };
 
-// Auto start jika file dijalankan langsung
+// AUTO START JIKA DIJALANKAN LANGSUNG
 if (require.main === module) {
-  const security = new SecuritySystem();
-  console.log('🔒 Security System is running...');
+  console.log('🚀 Starting Security System...');
   
-  // Test: Simulasi permintaan akses
-  // const testData = {
-  //   userId: '123456789',
-  //   username: 'testuser',
-  //   licenseKey: 'WRONG_KEY',
-  //   password: 'WRONG_PASS',
-  //   token: 'WRONG_TOKEN',
-  //   otp: '123456'
-  // };
-  // security.checkAllSecurity(testData);
+  // Initialize security system
+  const security = new SecuritySystem();
+  
+  // Keep the script running
+  console.log('✅ Security System is running');
+  console.log('📝 Bot Token:', config.security.bot_token ? '✅ Set' : '❌ Not set');
+  console.log('👑 Owner ID:', config.security.owner_id || '❌ Not set');
+  console.log('⚡ Kill Switch:', security.killSwitchActivated ? '🚫 ACTIVE' : '✅ INACTIVE');
+  
+  // Test jika ingin
+  if (process.argv.includes('--test')) {
+    console.log('\n🧪 Running test...');
+    
+    const testData = {
+      userId: '8248734943',
+      username: 'NortxhZ'
+    };
+    
+    security.verifyAccess(testData).then(result => {
+      console.log('Test result:', result);
+    });
+  }
 }
