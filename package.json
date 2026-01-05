@@ -1,16 +1,17 @@
 {
-  "name": "telegram-bot-security",
+  "name": "real-security-system",
   "version": "1.0.0",
-  "description": "Sistem keamanan untuk Telegram bot",
-  "main": "bot_security.js",
+  "description": "Sistem Keamanan Real untuk Telegram Bot",
+  "main": "a.js",
   "scripts": {
     "start": "node a.js",
-    "test": "node test.js"
+    "setup": "npm install",
+    "test": "echo 'Gunakan: /test di bot'"
   },
   "dependencies": {
     "node-telegram-bot-api": "^0.61.0"
   },
-  "keywords": ["telegram", "bot", "security"],
-  "author": "Rbcdepp",
+  "keywords": ["security", "telegram", "bot", "verification"],
+  "author": "@Rbcdepp",
   "license": "MIT"
 }
